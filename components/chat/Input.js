@@ -1,5 +1,6 @@
-import { IconCheck, IconInfoCircle, IconPlus } from "@tabler/icons-react";
-import { ArrowUpIcon, Search } from "lucide-react";
+"use client";
+import { IconPlus } from "@tabler/icons-react";
+import { ArrowUpIcon } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -16,17 +17,26 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
+import { useState } from "react";
+import { sendUserPrompt } from "@lib/api-client.js";
 const Input = () => {
+  const [prompt, setPrompt] = useState();
+  const handleUserInput = (e) => {
+    setPrompt(e.target.value);
+  };
+  const submitPrompt = async () => {
+    const res = await sendUserPrompt();
+  };
   return (
     <>
       <InputGroup className="w-3xl">
-        <InputGroupTextarea placeholder="Ask, Search or Chat..." />
+        <InputGroupTextarea
+          placeholder="Ask, Search or Chat..."
+          onChange={(e) => {
+            handleUserInput(e);
+          }}
+        />
         <InputGroupAddon align="block-end">
           <InputGroupButton
             variant="outline"
