@@ -80,6 +80,7 @@ const Input = () => {
             size="icon-xs"
             disabled={!prompt.trim() || isLoading}
           >
+            <input type="file"/>
             <ArrowUpIcon />
             <span className="sr-only">Send</span>
           </InputGroupButton>
