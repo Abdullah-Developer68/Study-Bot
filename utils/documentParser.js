@@ -1,11 +1,22 @@
 /**
- * Extract text from PDF file
+ * Extract text from PDF file using unpdf (server-side compatible)
  */
 export async function parsePDF(buffer) {
   try {
-    const pdfParse = (await import("pdf-parse")).default;
-    const data = await pdfParse(buffer);
-    return data.text;
+    const { extractText } = await import("unpdf");
+
+    // Convert Buffer to Uint8Array
+    const uint8Array = new Uint8Array(buffer);
+
+    // Extract text from PDF - returns { totalPages, text } where text is an array
+    const result = await extractText(uint8Array);
+
+    // text can be an array of strings (one per page) or a single string
+    const text = Array.isArray(result.text)
+      ? result.text.join("\n\n")
+      : String(result.text || "");
+
+    return text.trim();
   } catch (error) {
     throw new Error(`Failed to parse PDF: ${error.message}`);
   }

@@ -55,12 +55,21 @@ export async function POST(req) {
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());
 
+    console.log(
+      `Processing file: ${file.name}, type: ${file.type}, size: ${file.size} bytes`,
+    );
+
     // Parse document
     let extractedText;
     try {
       extractedText = await parseDocument(buffer, file.name, file.type);
     } catch (parseError) {
-      console.error("Document parsing error:", parseError);
+      console.error("Document parsing error details:", {
+        fileName: file.name,
+        fileType: file.type,
+        error: parseError.message,
+        stack: parseError.stack,
+      });
       return NextResponse.json(
         {
           error: `Failed to extract text from document: ${parseError.message}`,

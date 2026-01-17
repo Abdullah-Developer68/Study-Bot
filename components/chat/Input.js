@@ -61,7 +61,7 @@ const validateFile = (file) => {
 
 const Input = () => {
   const [prompt, setPrompt] = useState("");
-  const [attachedFile, setAttachedFile] = useState(null);
+  const [attachedFiles, setAttachedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const fileInputRef = useRef(null);
@@ -75,99 +75,141 @@ const Input = () => {
     fileInputRef.current?.click();
   };
 
-  // Handle file selection
+  // Handle file selection (multiple files)
   const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    // Reset previous state
+    // Reset previous error
     setUploadError(null);
 
-    // Validate file using api-client utility
-    const validation = validateFile(file);
-    if (!validation.valid) {
-      setUploadError(validation.error);
-      return;
+    // Validate all files first
+    for (const file of files) {
+      const validation = validateFile(file);
+      if (!validation.valid) {
+        setUploadError(`${file.name}: ${validation.error}`);
+        return;
+      }
     }
 
     setIsUploading(true);
 
     try {
-      const data = await uploadDocument(file);
-
-      setAttachedFile({
-        name: file.name,
-        type: file.type,
-        size: file.size,
-        extractedText: data.extractedText,
-        wasTruncated: data.wasTruncated,
+      // Upload all files in parallel
+      const uploadPromises = files.map(async (file) => {
+        const data = await uploadDocument(file);
+        return {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          extractedText: data.extractedText,
+          wasTruncated: data.wasTruncated,
+        };
       });
+
+      const uploadedFiles = await Promise.all(uploadPromises);
+
+      // Add to existing attached files
+      setAttachedFiles((prev) => [...prev, ...uploadedFiles]);
     } catch (error) {
       console.error("File upload error:", error);
       setUploadError(error.message);
     } finally {
       setIsUploading(false);
-      // Reset file input so same file can be selected again
+      // Reset file input so same files can be selected again
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
     }
   };
 
-  // Remove attached file
-  const handleRemoveFile = () => {
-    setAttachedFile(null);
+  // Remove a specific attached file
+  const handleRemoveFile = (index) => {
+    setAttachedFiles((prev) => prev.filter((_, i) => i !== index));
+    setUploadError(null);
+  };
+
+  // Remove all attached files
+  const handleRemoveAllFiles = () => {
+    setAttachedFiles([]);
     setUploadError(null);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!prompt.trim() || isLoading || isUploading) return;
+    if (
+      (!prompt.trim() && attachedFiles.length === 0) ||
+      isLoading ||
+      isUploading
+    )
+      return;
 
     // Get user's actual prompt
-    const userPrompt = prompt.trim();
+    const userPrompt = prompt.trim() || "Please summarize these documents.";
 
-    // Build the full message content for AI (file content first, then user prompt)
+    // Build the full message content for AI (all file contents first, then user prompt)
     let messageForAI = userPrompt;
-    if (attachedFile) {
-      messageForAI = `[Document: ${attachedFile.name}]\n\n${attachedFile.extractedText}\n\n[User Request]: ${userPrompt}`;
+    if (attachedFiles.length > 0) {
+      const documentsContent = attachedFiles
+        .map((file) => `[Document: ${file.name}]\n\n${file.extractedText}`)
+        .join("\n\n---\n\n");
+      messageForAI = `${documentsContent}\n\n[User Request]: ${userPrompt}`;
     }
 
     // AI SDK 5.0+ expects a message object with parts, not a plain string
-    // Send the full content to AI but it will be processed server-side
     sendMessage({
       role: "user",
       content: messageForAI,
     });
 
     setPrompt("");
-    setAttachedFile(null);
+    setAttachedFiles([]);
     setUploadError(null);
   };
 
   return (
     <form onSubmit={handleSubmit} className="w-3xl">
-      {/* File attachment preview */}
-      {attachedFile && (
-        <div className="mb-2 flex items-center gap-2 bg-blue-900/30 border border-blue-700 rounded-lg px-3 py-2 text-sm">
-          <FileText size={16} className="text-blue-400 shrink-0" />
-          <span
-            className="text-blue-200 truncate flex-1"
-            title={attachedFile.name}
-          >
-            {attachedFile.name}
-          </span>
-          {attachedFile.wasTruncated && (
-            <span className="text-yellow-400 text-xs">(truncated)</span>
+      {/* File attachments preview */}
+      {attachedFiles.length > 0 && (
+        <div className="mb-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-blue-700 scrollbar-track-transparent">
+            {attachedFiles.map((file, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-1.5 bg-blue-900/30 border border-blue-700 rounded-lg px-2 py-1.5 text-xs shrink-0 max-w-[140px]"
+              >
+                <FileText size={14} className="text-blue-400 shrink-0" />
+                <span className="text-blue-200 truncate" title={file.name}>
+                  {file.name}
+                </span>
+                {file.wasTruncated && (
+                  <span
+                    className="text-yellow-400 text-[10px]"
+                    title="Content was truncated"
+                  >
+                    !
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveFile(index)}
+                  className="text-blue-300 hover:text-white transition-colors p-0.5 rounded hover:bg-blue-800/50 shrink-0"
+                  title="Remove file"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+          {attachedFiles.length > 1 && (
+            <button
+              type="button"
+              onClick={handleRemoveAllFiles}
+              className="text-xs text-blue-300 hover:text-white mt-1"
+            >
+              Remove all
+            </button>
           )}
-          <button
-            type="button"
-            onClick={handleRemoveFile}
-            className="text-blue-300 hover:text-white transition-colors p-1 rounded hover:bg-blue-800/50"
-            title="Remove file"
-          >
-            <X size={14} />
-          </button>
         </div>
       )}
 
@@ -188,8 +230,8 @@ const Input = () => {
       <InputGroup className="w-full">
         <InputGroupTextarea
           placeholder={
-            attachedFile
-              ? "Ask a question about the document..."
+            attachedFiles.length > 0
+              ? "Ask a question about the documents..."
               : "Ask, Search or Chat..."
           }
           value={prompt}
@@ -205,6 +247,7 @@ const Input = () => {
             onChange={handleFileChange}
             className="hidden"
             disabled={isLoading}
+            multiple
           />
 
           {/* File upload button */}
@@ -262,7 +305,7 @@ const Input = () => {
               variant="default"
               className="rounded-full cursor-pointer"
               size="icon-xs"
-              disabled={(!prompt.trim() && !attachedFile) || isUploading}
+              disabled={!prompt.trim() || isUploading}
             >
               <ArrowUpIcon />
               <span className="sr-only">Send</span>
