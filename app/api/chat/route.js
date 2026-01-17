@@ -1,4 +1,4 @@
-import { streamText } from "ai";
+import { streamText, smoothStream } from "ai";
 import { NextResponse } from "next/server";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
@@ -42,9 +42,10 @@ export async function POST(req) {
     const result = streamText({
       model: openrouter("xiaomi/mimo-v2-flash:free"),
       messages: transformedMessages,
-      experimental_telemetry: {
-        isEnabled: true,
-      },
+      experimental_transform: smoothStream({
+        delayInMs: 10,
+        chunking: "word",
+      }), // sends a lot of chunks with smaller content
     });
 
     return result.toUIMessageStreamResponse();

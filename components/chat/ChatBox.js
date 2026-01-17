@@ -79,7 +79,7 @@ const ChatBox = () => {
               <div className="shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
                 <Bot size={18} className="text-white" />
               </div>
-              <div className=" text-gray-100 rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
+              <div className=" text-gray-100 rounded-2xl rounded-tl-sm p-3 min-w-[80%]">
                 <div className="prose prose-sm prose-invert max-w-none wrap-break-words">
                   {/* Markdown Handling */}
                   <ReactMarkdown

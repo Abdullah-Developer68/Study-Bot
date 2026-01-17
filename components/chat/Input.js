@@ -58,7 +58,7 @@ const Input = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <InputGroupButton type="button" variant="ghost">
-                Auto
+                Tools
               </InputGroupButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
