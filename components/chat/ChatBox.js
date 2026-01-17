@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import useChatContext from "@/hooks/useChatContext";
-import { Bot, Loader2, User } from "lucide-react";
+import { Bot, Loader2, User, FileText } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -29,15 +29,38 @@ const ChatBox = () => {
     return "";
   };
 
+  // Helper function to extract user-visible content (hide document content)
+  const getUserDisplayContent = (content) => {
+    // Check if message contains document content
+    const docMatch = content.match(
+      /^\[Document: (.+?)\]\n\n[\s\S]*?\n\n\[User Request\]: ([\s\S]*)$/,
+    );
+    if (docMatch) {
+      const fileName = docMatch[1];
+      const userRequest = docMatch[2];
+      return { fileName, userRequest };
+    }
+    return { fileName: null, userRequest: content };
+  };
+
   return (
     <div className="flex flex-col p-4 gap-4 w-[90%] overflow-auto max-h-[80%]">
       {messages.map((message, index) => {
         const content = getMessageContent(message);
 
         if (message.role === "user") {
+          const { fileName, userRequest } = getUserDisplayContent(content);
+
           return (
             <div key={index} className="flex justify-end items-start gap-2">
               <div className="bg-gray-700 text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%]">
+                {/* Show file attachment indicator */}
+                {fileName && (
+                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-600 text-sm text-blue-300">
+                    <FileText size={14} />
+                    <span>{fileName}</span>
+                  </div>
+                )}
                 <div className="prose prose-sm prose-invert max-w-none wrap-break-words">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -63,8 +86,8 @@ const ChatBox = () => {
                       ),
                     }}
                   >
-                    {/* This contains the message and reactMarkdown formats it*/}
-                    {content}
+                    {/* Show only the user's request, not the full document content */}
+                    {userRequest}
                   </ReactMarkdown>
                 </div>
               </div>
