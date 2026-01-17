@@ -7,6 +7,7 @@ import { useEffect } from "react";
 const ChatProvider = ({ children }) => {
   const chat = useChat({
     api: "/api/chat",
+    experimental_throttle: 30, // throttles updates to every 30ms
   });
 
   useEffect(() => {

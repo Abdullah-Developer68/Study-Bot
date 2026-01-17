@@ -37,7 +37,7 @@ const ChatBox = () => {
         if (message.role === "user") {
           return (
             <div key={index} className="flex justify-end items-start gap-2">
-              <div className="bg-blue-600 text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%]">
+              <div className="bg-gray-700 text-white rounded-2xl rounded-tr-sm p-3 max-w-[80%]">
                 <div className="prose prose-sm prose-invert max-w-none wrap-break-words">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
@@ -75,11 +75,11 @@ const ChatBox = () => {
           );
         } else {
           return (
-            <div key={index} className="flex justify-start items-start gap-2">
+            <div key={index} className="flex justify-center items-start gap-2">
               <div className="shrink-0 w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
                 <Bot size={18} className="text-white" />
               </div>
-              <div className="bg-gray-800 text-gray-100 rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
+              <div className=" text-gray-100 rounded-2xl rounded-tl-sm p-3 max-w-[80%]">
                 <div className="prose prose-sm prose-invert max-w-none wrap-break-words">
                   {/* Markdown Handling */}
                   <ReactMarkdown

@@ -42,6 +42,9 @@ export async function POST(req) {
     const result = streamText({
       model: openrouter("xiaomi/mimo-v2-flash:free"),
       messages: transformedMessages,
+      experimental_telemetry: {
+        isEnabled: true,
+      },
     });
 
     return result.toUIMessageStreamResponse();
