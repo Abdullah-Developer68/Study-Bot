@@ -19,14 +19,21 @@ import {
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 
-const SUPPORTED_FILE_TYPES = ".pdf,.docx,.doc,.xlsx,.xls,.pptx,.ppt,.md,.txt";
+const SUPPORTED_FILE_TYPES = [
+  ".pdf",
+  ".docx",
+  ".doc",
+  ".xlsx",
+  ".xls",
+  ".pptx",
+  ".ppt",
+  ".md",
+  ".txt",
+];
 const MAX_FILE_SIZE_MB = 10;
 
 // Validate file before upload
 const validateFile = (file) => {
-  // Returns an array of supported extensions
-  const supportedExtensions = SUPPORTED_FILE_TYPES.split(",");
-
   // Check file size
   const fileSizeInMB = file.size / (1024 * 1024);
   if (fileSizeInMB > MAX_FILE_SIZE_MB) {
@@ -38,14 +45,14 @@ const validateFile = (file) => {
 
   // Check file extension
   const fileName = file.name.toLowerCase();
-  const hasValidExtension = supportedExtensions.some((ext) =>
+  const hasValidExtension = SUPPORTED_FILE_TYPES.some((ext) =>
     fileName.endsWith(ext),
   );
 
   if (!hasValidExtension) {
     return {
       valid: false,
-      error: `Unsupported file type. Supported formats: ${supportedExtensions.join(", ")}`,
+      error: `Unsupported file type. Supported formats: ${SUPPORTED_FILE_TYPES.join(", ")}`,
     };
   }
 
@@ -194,7 +201,7 @@ const Input = () => {
           <input
             ref={fileInputRef}
             type="file"
-            accept={SUPPORTED_FILE_TYPES}
+            accept={SUPPORTED_FILE_TYPES.join(",")}
             onChange={handleFileChange}
             className="hidden"
             disabled={isLoading}
