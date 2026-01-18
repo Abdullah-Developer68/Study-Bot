@@ -11,8 +11,8 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 
-// This is using MDX Editor to create a markdown editor component
-const MarkDownEditor = ({ markdown, onChange }) => {
+// This is using MDX Editor package to create a markdown editor component
+const mdEditor = ({ markdown, onChange }) => {
   return (
     <MDXEditor
       markdown={markdown}
@@ -39,4 +39,4 @@ const MarkDownEditor = ({ markdown, onChange }) => {
   );
 };
 
-export default MarkDownEditor;
+export default mdEditor;
