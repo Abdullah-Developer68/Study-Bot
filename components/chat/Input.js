@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import useChatContext from "@/hooks/useChatContext";
 import { uploadDocument } from "@/lib/api-client";
+import { getSupportedExtensions } from "@/lib/documentParser";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,17 +29,7 @@ import {
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 
-const SUPPORTED_FILE_TYPES = [
-  ".pdf",
-  ".docx",
-  ".doc",
-  ".xlsx",
-  ".xls",
-  ".pptx",
-  ".ppt",
-  ".md",
-  ".txt",
-];
+const SUPPORTED_FILE_TYPES = getSupportedExtensions();
 const MAX_FILE_SIZE_MB = 10;
 
 // Validate file before upload

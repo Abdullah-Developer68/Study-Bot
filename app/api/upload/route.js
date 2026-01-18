@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { parseDocument } from "@/utils/documentParser";
+import { parseDocument } from "@/lib/documentParser";
 
 const MAX_FILE_SIZE_MB = 10; // 10MB limit
 const MAX_TEXT_LENGTH = 50000; // ~12,500 tokens - adjust based on your model's context limit

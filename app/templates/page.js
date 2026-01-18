@@ -1,4 +1,4 @@
-import TemplateManager from "@/components/templates/templateManager";
+import TemplateManager from "@/components/templates/TemplateManager";
 const Templates = () => {
   return <TemplateManager />;
 };
