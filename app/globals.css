@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "tailwindcss";
+
+/* In v4, you add plugins like this */
+@plugin "@tailwindcss/typography";
 
 @source "../components/**/*.{js,jsx,ts,tsx}";
 
