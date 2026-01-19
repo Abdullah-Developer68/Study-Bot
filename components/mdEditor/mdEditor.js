@@ -14,11 +14,10 @@ import {
   tablePlugin,
   thematicBreakPlugin,
   markdownShortcutPlugin,
-  // Corrected toolbar components:
-  InsertCodeBlock, // Replaces CodeToggle
-  CreateLink, // Replaces LinkToggle
-  InsertImage, // Replaces ImageToggle
-  InsertTable, // Replaces TableToggle
+  InsertCodeBlock,
+  CreateLink,
+  InsertImage,
+  InsertTable,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 
@@ -27,7 +26,7 @@ const mdEditor = ({ markdown, onChange }) => {
     <MDXEditor
       markdown={markdown}
       onChange={onChange}
-      className="prose max-w-none border rounded-md shadow-sm bg-white dark:bg-gray-800"
+      className="prose max-w-none border rounded-md shadow-sm bg-gray-200 w-3/4"
       contentEditableClassName="min-h-[400px] p-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
       plugins={[
         headingsPlugin(),
