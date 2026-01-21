@@ -13,7 +13,7 @@ const NewTemplate = () => {
   );
 
   return (
-    <div className="p-8 w-full mx-auto flex flex-col items-center justify-center">
+    <div className="p-8 w-full bg-red-500 mx-auto flex flex-col items-center justify-center">
       <Editor markdown={content} onChange={(v) => setContent(v)} />
 
       <div className="mt-10 p-4 bg-gray-50 rounded border">

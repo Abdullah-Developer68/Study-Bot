@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/app/providers/ThemeProvider";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/global/AppSidebar";
 import "./globals.css";
+import editorStyle from "@/app/editorStyle.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
