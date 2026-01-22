@@ -4,11 +4,12 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import { FloatingMenu, BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import ToolBar from "@components/tiptab/toolbar/ToolBar";
+import Highlight from "@tiptap/extension-highlight";
 
 const Tiptap = () => {
   const editor = useEditor({
-    extensions: [StarterKit],
-    content: "<p>Hello World! 🌎️</p>",
+    extensions: [StarterKit, Highlight.configure({ multicolor: true })],
+    content: "<p>Hello World! </p>",
     // Don't render immediately on the server to avoid SSR issues
     immediatelyRender: false,
   });
