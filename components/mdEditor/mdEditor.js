@@ -1,5 +1,3 @@
-"use client";
-"use client";
 import {
   MDXEditor,
   headingsPlugin,
@@ -20,7 +18,7 @@ import {
   InsertImage,
   InsertTable,
   BlockTypeSelect,
-  
+  codeMirrorPlugin,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 
@@ -35,25 +33,29 @@ const mdEditor = ({ markdown, onChange }) => {
         headingsPlugin(),
         listsPlugin(),
         quotePlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: "javascript" }),
+        // 1. Configure the available languages in codeMirrorPlugin
+        codeMirrorPlugin({
+          codeBlockLanguages: { javascript: "JavaScript" },
+        }),
+        // 2. Configure the default behavior in codeBlockPlugin (DO NOT duplicate languages here)
+        codeBlockPlugin({
+          defaultCodeBlockLanguage: "javascript",
+        }),
         linkPlugin(),
         imagePlugin(),
         tablePlugin(),
-        headingsPlugin(),
         thematicBreakPlugin(),
         markdownShortcutPlugin(),
         toolbarPlugin({
           toolbarPosition: "top",
           toolbarClassName:
-            "w-full border border-black sticky top-0 z-10 flex justify-center items-center",
+            "w-full sticky top-0 z-10 flex justify-center items-center",
           toolbarContents: () => (
             <>
               <UndoRedo />
               <BoldItalicUnderlineToggles />
               <ListsToggle />
               <BlockTypeSelect />
-
-              {/* Corrected Toolbar Buttons */}
               <InsertCodeBlock />
               <CreateLink />
               <InsertImage />
