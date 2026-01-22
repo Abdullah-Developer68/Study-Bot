@@ -1,3 +1,4 @@
+// This is the file that i am creating myself to create a custom editor
 "use client";
 
 import { useEditor, EditorContent } from "@tiptap/react";
