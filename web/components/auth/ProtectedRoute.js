@@ -2,27 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
+import useAuth from "@/hooks/auth/useAuth";
 
-/**
- * ProtectedRoute Component
- * Wraps pages/components that require authentication
- * Redirects to /auth if user is not authenticated
- *
- * @param {React.ReactNode} children - The protected content
- * @param {string} redirectTo - Where to redirect if not authenticated (default: /auth)
- * @param {React.ReactNode} loadingComponent - Custom loading component (optional)
- *
- * @example
- * // In a page component:
- * export default function DashboardPage() {
- *   return (
- *     <ProtectedRoute>
- *       <Dashboard />
- *     </ProtectedRoute>
- *   );
- * }
- */
 const ProtectedRoute = ({
   children,
   redirectTo = "/auth",
@@ -36,7 +17,9 @@ const ProtectedRoute = ({
       // Store the current path to redirect back after login
       const currentPath = window.location.pathname;
       const redirectUrl =
-        currentPath !== "/" ? `${redirectTo}?redirectTo=${currentPath}` : redirectTo;
+        currentPath !== "/"
+          ? `${redirectTo}?redirectTo=${currentPath}`
+          : redirectTo;
       router.push(redirectUrl);
     }
   }, [loading, isAuthenticated, router, redirectTo]);
