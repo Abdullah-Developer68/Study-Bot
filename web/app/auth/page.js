@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn, signUp, signInWithOAuth } from "@/lib/supabase";
+import { signUpUser, signInUser } from "@/packages/supabase/auth/auth";
+import supabaseClient from "@/lib/supabaseClient";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -35,14 +36,22 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data, error } = await signIn(email, password);
+        const { data, error } = await signInUser(
+          supabaseClient,
+          email,
+          password,
+        );
         if (error) {
           setError(error);
         } else {
           router.push("/");
         }
       } else {
-        const { data, error } = await signUp(email, password);
+        const { data, error } = await signUpUser(
+          supabaseClient,
+          email,
+          password,
+        );
         if (error) {
           setError(error);
         } else {
