@@ -21,7 +21,7 @@ import {
   signInWithOAuthUser,
 } from "@studybot/supabase";
 import { createClient } from "@/utils/supabase/client";
-
+// This sends the browser client over to packages directory
 const supabaseClient = createClient();
 
 const Auth = () => {
