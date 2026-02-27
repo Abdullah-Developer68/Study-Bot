@@ -15,11 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  signUpUser,
-  signInUser,
-  signInWithOAuthUser,
-} from "@studybot/supabase";
+import { signUp, signIn, signInWithOAuth } from "@studybot/supabase";
 import { createClient } from "@/utils/supabase/client";
 // This sends the browser client over to packages directory
 const supabaseClient = createClient();
@@ -42,10 +38,10 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        await signInUser(supabaseClient, email, password);
+        await signIn(supabaseClient, email, password);
         router.push("/");
       } else {
-        await signUpUser(supabaseClient, email, password);
+        await signUp(supabaseClient, email, password);
         setMessage("Check your email to confirm your account");
       }
     } catch (err) {
@@ -60,7 +56,7 @@ const Auth = () => {
     setError("");
 
     try {
-      await signInWithOAuthUser(supabaseClient, "google");
+      await signInWithOAuth(supabaseClient, "google");
       // OAuth will redirect automatically
     } catch (err) {
       setError(err?.message || "Failed to sign in with Google");

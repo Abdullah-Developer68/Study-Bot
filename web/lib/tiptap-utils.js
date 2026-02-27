@@ -6,7 +6,10 @@ import {
 } from "@tiptap/pm/state";
 import { cellAround, CellSelection } from "@tiptap/pm/tables";
 import { findParentNodeClosestToPos } from "@tiptap/react";
-import { uploadImage, getUser } from "@/lib/supabase";
+import { uploadImage, getUser } from "@studybot/supabase";
+import { createClient } from "@/utils/supabase/client";
+
+const supabaseClient = createClient();
 
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -336,15 +339,21 @@ export const handleImageUpload = async (file, onProgress, abortSignal) => {
 
   try {
     // Get current user ID from Supabase
-    const { user, error: authError } = await getUser();
+    const { user } = await getUser(supabaseClient);
 
-    if (authError || !user) {
+    if (!user) {
       throw new Error(
         "User not authenticated. Please log in to upload images.",
       );
     }
 
-    const result = await uploadImage(file, user.id, null, onProgress);
+    const result = await uploadImage(
+      supabaseClient,
+      file,
+      user.id,
+      null,
+      onProgress,
+    );
 
     if (result.error) {
       throw new Error(result.error);

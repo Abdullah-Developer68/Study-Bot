@@ -1,11 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  onAuthStateChange,
-  getUserSession,
-  getCurrentUser,
-} from "@studybot/supabase";
+import { onAuthStateChange, getSession, getUser } from "@studybot/supabase";
 import { createClient } from "@/utils/supabase/client";
 import { useCallback } from "react";
 
@@ -20,7 +16,7 @@ export function AuthProvider({ children }) {
   const getUserFromSession = useCallback(async () => {
     try {
       // First check if there's an active session on mount
-      const sessionData = await getUserSession(supabaseClient);
+      const sessionData = await getSession(supabaseClient);
 
       const session = sessionData?.session;
 
@@ -30,7 +26,7 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      const userData = await getCurrentUser(supabaseClient);
+      const userData = await getUser(supabaseClient);
       setUser(userData?.user ?? null);
     } catch (error) {
       // optional: log once

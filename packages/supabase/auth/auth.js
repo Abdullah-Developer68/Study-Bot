@@ -1,4 +1,11 @@
-const signUpUser = async (supabaseClient, email, password) => {
+const ensureClient = (supabaseClient) => {
+  if (!supabaseClient?.auth) {
+    throw new Error("Supabase client is required");
+  }
+};
+
+const signUp = async (supabaseClient, email, password) => {
+  ensureClient(supabaseClient);
   const { data, error } = await supabaseClient.auth.signUp({
     email,
     password,
@@ -10,7 +17,8 @@ const signUpUser = async (supabaseClient, email, password) => {
   return data;
 };
 
-const signInUser = async (supabaseClient, email, password) => {
+const signIn = async (supabaseClient, email, password) => {
+  ensureClient(supabaseClient);
   const { data, error } = await supabaseClient.auth.signInWithPassword({
     email,
     password,
@@ -22,18 +30,16 @@ const signInUser = async (supabaseClient, email, password) => {
   return data;
 };
 
-const signOutUser = async (supabaseClient) => {
+const signOut = async (supabaseClient) => {
+  ensureClient(supabaseClient);
   const { error } = await supabaseClient.auth.signOut();
   if (error) {
     throw new Error(error.message);
   }
 };
 
-const signInWithOAuthUser = async (
-  supabaseClient,
-  provider,
-  redirectTo = null,
-) => {
+const signInWithOAuth = async (supabaseClient, provider, redirectTo = null) => {
+  ensureClient(supabaseClient);
   const options = {};
 
   if (redirectTo) {
@@ -52,7 +58,8 @@ const signInWithOAuthUser = async (
   return data;
 };
 
-const getUserSession = async (supabaseClient) => {
+const getSession = async (supabaseClient) => {
+  ensureClient(supabaseClient);
   const { data, error } = await supabaseClient.auth.getSession();
   if (error) {
     throw new Error(error.message);
@@ -60,7 +67,8 @@ const getUserSession = async (supabaseClient) => {
   return data;
 };
 
-const getCurrentUser = async (supabaseClient) => {
+const getUser = async (supabaseClient) => {
+  ensureClient(supabaseClient);
   const { data, error } = await supabaseClient.auth.getUser();
   if (error) {
     throw new Error(error.message);
@@ -69,6 +77,7 @@ const getCurrentUser = async (supabaseClient) => {
 };
 
 const onAuthStateChange = (supabaseClient, callback) => {
+  ensureClient(supabaseClient);
   const {
     data: { subscription },
   } = supabaseClient.auth.onAuthStateChange((event, session) => {
@@ -79,11 +88,11 @@ const onAuthStateChange = (supabaseClient, callback) => {
 };
 
 export {
-  signUpUser,
-  signInUser,
-  signOutUser,
-  signInWithOAuthUser,
-  getUserSession,
-  getCurrentUser,
+  signUp,
+  signIn,
+  signOut,
+  signInWithOAuth,
+  getSession,
+  getUser,
   onAuthStateChange,
 };
