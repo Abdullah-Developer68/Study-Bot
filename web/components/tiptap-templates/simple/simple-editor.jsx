@@ -14,7 +14,7 @@ import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
 import { Selection } from "@tiptap/extensions";
 import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
-import { common, createLowlight } from "lowlight";
+import lowlight from "@/lib/tiptap-lowlight";
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button";
@@ -78,8 +78,6 @@ import "@/components/tiptap-templates/simple/simple-editor.scss";
 import content from "@/components/tiptap-templates/simple/data/content.json";
 
 import useAuth from "@/hooks/auth/useAuth";
-
-const lowlight = createLowlight(common);
 
 const MainToolbarContent = ({ onHighlighterClick, onLinkClick, isMobile }) => {
   return (
@@ -196,6 +194,15 @@ export function SimpleEditor() {
         lowlight,
         defaultLanguage: "javascript",
         languageClassPrefix: "language-",
+        // This is done so that it does not messes with the code
+        HTMLAttributes: {
+          spellcheck: "false",
+          autocorrect: "off",
+          autocapitalize: "off",
+          "data-gramm": "false",
+          "data-gramm_editor": "false",
+          "data-enable-grammarly": "false",
+        },
       }),
       HorizontalRule,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
