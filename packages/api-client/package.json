@@ -1,0 +1,16 @@
+{
+  "name": "@studybot/api-client",
+  "version": "0.1.0",
+  "description": "Shared api client utilities for StudyBot apps",
+  "type": "module",
+  "main": "./api-client.js",
+  "exports": {
+    ".": "./api-client.js"
+  },
+  "files": [
+    "./api-client.js"
+  ],
+  "dependencies": {
+    "axios": "^1.13.2"
+  }
+}

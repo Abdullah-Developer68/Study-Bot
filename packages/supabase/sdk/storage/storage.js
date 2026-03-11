@@ -107,15 +107,13 @@ const resolveImageUrl = async (supabaseClient, pathOrUrl, options = {}) => {
     return { url: null, error: "Invalid image path/url" };
   }
 
-  // If it's already an absolute URL, return it as-is. For public buckets, this allows direct URLs to work without signing.
   if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
     return { url: pathOrUrl, error: null };
   }
-  // For private buckets generate a signed URL. This assumes the pathOrUrl is in the format "bucket/path/to/file.jpg".
+
   const bucket = options.bucket ?? "images";
   const expiresIn = options.expiresIn ?? 3600;
 
-  // error handling has already been handled in getSignedUrl
   const result = await getSignedUrl(
     supabaseClient,
     bucket,
@@ -230,12 +228,10 @@ const signOwnedImagePath = async (supabaseClient, params = {}) => {
     return { url: value, error: null, path: value, bucket };
   }
 
-  // Accept "images/userId/file.png" or "userId/file.png"
   const normalizedPath = value.startsWith(`${bucket}/`)
     ? value.slice(bucket.length + 1)
     : value;
 
-  // Enforce owner folder convention
   const ownerFolder = normalizedPath.split("/")[0];
   if (ownerFolder !== requesterId) {
     return { url: null, error: "Forbidden path access" };

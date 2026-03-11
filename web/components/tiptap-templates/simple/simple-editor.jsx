@@ -75,7 +75,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
 
-import content from "@/components/tiptap-templates/simple/data/content.json";
+import defaultContent from "@/components/tiptap-templates/simple/data/content.json";
 
 import useAuth from "@/hooks/auth/useAuth";
 
@@ -159,7 +159,7 @@ const MobileToolbarContent = ({ type, onBack }) => (
   </>
 );
 
-export function SimpleEditor() {
+export function SimpleEditor({ initialContent = defaultContent, onChange }) {
   const isMobile = useIsBreakpoint();
   const { height } = useWindowSize();
   const { userId } = useAuth();
@@ -226,7 +226,10 @@ export function SimpleEditor() {
         onError: (error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+    content: initialContent,
+    onUpdate: ({ editor }) => {
+      onChange?.(editor.getJSON());
+    },
   });
 
   const rect = useCursorVisibility({
@@ -239,6 +242,27 @@ export function SimpleEditor() {
       setMobileView("main");
     }
   }, [isMobile, mobileView]);
+
+  useEffect(() => {
+    if (!editor || !initialContent) {
+      return;
+    }
+
+    const nextContent = JSON.stringify(initialContent);
+    const currentContent = JSON.stringify(editor.getJSON());
+
+    if (currentContent !== nextContent) {
+      editor.commands.setContent(initialContent);
+    }
+  }, [editor, initialContent]);
+
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+
+    onChange?.(editor.getJSON());
+  }, [editor, onChange]);
 
   return (
     <div className="simple-editor-wrapper">
