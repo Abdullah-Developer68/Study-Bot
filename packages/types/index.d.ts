@@ -1,1 +1,2 @@
-export * from "./upload.d.ts";
+export * from "./upload";
+export * from "./file";
