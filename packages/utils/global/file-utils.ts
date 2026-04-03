@@ -16,6 +16,11 @@ const getSupportedExtensions = () => {
   ];
 };
 
+const getExtension = (fileName: string): string => {
+  const ext = fileName.toLowerCase().split(".").pop();
+  return ext ?? "";
+};
+
 // Validate file size (bytes)
 const validateFileSize = (fileSize: number, maxSizeInMB = 10): boolean => {
   const maxBytes = maxSizeInMB * 1024 * 1024;
@@ -29,13 +34,13 @@ const validateFileSize = (fileSize: number, maxSizeInMB = 10): boolean => {
 
 // Validate file extension
 const validateFileExtension = (fileName: string): boolean => {
-  const extension = fileName.toLowerCase().split(".").pop();
+  const extension = getExtension(fileName);
   if (!extension) {
     throw new Error("File has no extension");
   }
   const supportedExtensions = getSupportedExtensions();
-  const hasValidExtension = supportedExtensions.some((ext) =>
-    ext.toLowerCase() === `.${extension}`
+  const hasValidExtension = supportedExtensions.some(
+    (ext) => ext.toLowerCase() === `.${extension}`,
   );
   if (!hasValidExtension) {
     throw new Error(
@@ -48,6 +53,7 @@ const validateFileExtension = (fileName: string): boolean => {
 export {
   MAX_FILE_SIZE_MB,
   MAX_TEXT_LENGTH,
+  getExtension,
   getSupportedExtensions,
   validateFileSize,
   validateFileExtension,

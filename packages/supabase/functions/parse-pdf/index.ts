@@ -1,15 +1,13 @@
 import { extractText } from "unpdf";
-import { validateFileSize } from "@studybot/utils/global/file-utils.ts";
+import {
+  getExtension,
+  validateFileSize,
+} from "@studybot/utils/global/file-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
-};
-
-const getExtension = (fileName: string): string => {
-  const ext = fileName.toLowerCase().split(".").pop();
-  return ext ?? "";
 };
 
 Deno.serve(async (req) => {

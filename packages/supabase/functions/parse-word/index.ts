@@ -1,6 +1,9 @@
 import * as mammoth from "mammoth";
 import { Buffer } from "node:buffer";
-import { validateFileSize } from "@studybot/utils/global/file-utils.ts";
+import {
+  getExtension,
+  validateFileSize,
+} from "@studybot/utils/global/file-utils.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,11 +12,6 @@ const corsHeaders = {
 };
 
 const SUPPORTED_EXTENSIONS = ["doc", "docx"];
-
-const getExtension = (fileName: string): string => {
-  const ext = fileName.toLowerCase().split(".").pop();
-  return ext ?? "";
-};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
