@@ -1,8 +1,5 @@
 // -------------------  Types ---------------------
-import type {
-  UploadProgressCallback,
-  UploadResponse,
-} from "@studybot/types/upload";
+import type { UploadProgressCallback, UploadResponse } from "@studybot/types";
 
 import axios from "axios";
 import { MAX_TEXT_LENGTH } from "@studybot/utils/global/file-utils";

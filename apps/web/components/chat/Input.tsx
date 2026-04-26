@@ -1,7 +1,7 @@
 "use client";
 // Type-only imports first to keep runtime imports grouped separately.
-import type { ChangeEvent, FormEvent } from "react";
-import type { AttachedFile } from "@studybot/types/upload";
+import type { ChangeEvent } from "react";
+import type { AttachedFile, FormSubmitEvent } from "@studybot/types";
 
 import { useState, useRef } from "react";
 import { IconPlus } from "@tabler/icons-react";
@@ -15,7 +15,7 @@ import {
   BadgeQuestionMark,
   WalletCards,
 } from "lucide-react";
-import useChatContext from "@/hooks/chat/useChatContext";
+import useChatContext from "@/hooks/chat/useChatContext.js";
 import { uploadDocument } from "@studybot/api-client";
 
 // Import validators directly from file-utils to avoid barrel export ambiguity.
@@ -30,15 +30,15 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu.jsx";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupText,
   InputGroupTextarea,
-} from "@/components/ui/input-group";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/ui/input-group.jsx";
+import { Separator } from "@/components/ui/separator.jsx";
 
 const SUPPORTED_FILE_TYPES = getSupportedExtensions();
 
@@ -121,7 +121,7 @@ const Input = () => {
     setUploadError(null);
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormSubmitEvent) => {
     e.preventDefault();
     if (
       (!prompt.trim() && attachedFiles.length === 0) ||
@@ -242,7 +242,7 @@ const Input = () => {
           onChange={(e) => setPrompt(e.target.value)}
           disabled={isLoading}
         />
-        <InputGroupAddon align="block-end">
+        <InputGroupAddon align="block-end" className="">
           {/* Hidden file input */}
           <input
             ref={fileInputRef}
@@ -273,7 +273,7 @@ const Input = () => {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <InputGroupButton type="button" variant="ghost">
+              <InputGroupButton type="button" variant="ghost" className="">
                 <Bolt size={28} />
               </InputGroupButton>
             </DropdownMenuTrigger>
@@ -282,19 +282,19 @@ const Input = () => {
               align="start"
               className="[--radius:0.95rem]"
             >
-              <DropdownMenuItem>
+              <DropdownMenuItem className="" inset={false}>
                 <span className="flex items-center gap-2 justify-between w-full">
                   <p>Quiz</p>
                   <BadgeQuestionMark size={20} />
                 </span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="" inset={false}>
                 <span className="flex items-center gap-2 justify-between w-full">
                   <p>Flash Cards</p>
                   <WalletCards size={20} />
                 </span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="" inset={false}>
                 <span className="flex items-center gap-2 justify-between w-full">
                   <p>Manual</p>
                 </span>

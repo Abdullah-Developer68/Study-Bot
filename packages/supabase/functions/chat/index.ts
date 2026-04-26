@@ -1,0 +1,163 @@
+import { streamText, smoothStream } from "ai";
+import type { ModelMessage } from "ai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+
+// CORS headers keep browser requests to this edge function working.
+// The browser will send a preflight OPTIONS request before the actual chat POST,
+// so these headers need to be present on both the preflight and the real response.
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+// The edge function accepts the same chat payload shape used by useChat.
+// We keep this loose because the client may send extra fields, but we only
+// care about role, content, and assistant parts when building the prompt.
+type IncomingMessage = {
+  role: "user" | "assistant" | "system" | string;
+  content?: string;
+  parts?: Array<{ type?: string; text?: string }>;
+};
+
+// AI SDK model messages only support a limited set of roles here.
+// This guard lets TypeScript narrow a generic string role into a valid AI SDK role.
+const isSupportedRole = (
+  role: IncomingMessage["role"],
+): role is "user" | "assistant" | "system" => {
+  return role === "user" || role === "assistant" || role === "system";
+};
+
+// Small helper for consistent JSON error responses.
+// It ensures all non-streaming errors return the same JSON shape and CORS headers.
+const jsonResponse = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  });
+
+const extractAssistantTextFromParts = (
+  parts: IncomingMessage["parts"],
+): string => {
+  if (!Array.isArray(parts)) return "";
+  // Assistant messages can arrive as structured parts instead of a single string.
+  // We only keep text parts here and ignore any non-text content.
+  return parts
+    .filter((part) => part?.type === "text")
+    .map((part) => part?.text ?? "")
+    .join("");
+};
+
+// Normalize user/assistant messages into the strict AI SDK ModelMessage format.
+// This step protects the AI call from unsupported roles and empty messages,
+// which can happen because the chat client sends the full conversation state.
+const normalizeMessages = (messages: IncomingMessage[]): ModelMessage[] => {
+  const normalized: ModelMessage[] = [];
+
+  for (const message of messages) {
+    if (!isSupportedRole(message.role)) {
+      continue;
+    }
+
+    if (message.role === "assistant" && Array.isArray(message.parts)) {
+      const content = extractAssistantTextFromParts(message.parts).trim();
+      if (!content) {
+        continue;
+      }
+
+      normalized.push({ role: message.role, content });
+      continue;
+    }
+
+    const content =
+      typeof message.content === "string" ? message.content.trim() : "";
+    if (!content) {
+      continue;
+    }
+
+    normalized.push({ role: message.role, content });
+  }
+
+  return normalized;
+};
+
+Deno.serve(async (req) => {
+  // Preflight requests must return immediately for browser clients.
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  // Only POST is supported because the chat client sends message payloads.
+  if (req.method !== "POST") {
+    return jsonResponse({ error: "Method not allowed" }, 405);
+  }
+
+  try {
+    // The OpenRouter key is injected as a Supabase secret at deploy time.
+    const openRouterApiKey = Deno.env.get("OPENROUTER_API_KEY");
+    if (!openRouterApiKey) {
+      return jsonResponse(
+        { error: "OPENROUTER_API_KEY is not configured" },
+        500,
+      );
+    }
+
+    // useChat sends a JSON body containing the conversation history.
+    // We only read the messages array and ignore everything else.
+    const body = (await req.json()) as { messages?: IncomingMessage[] };
+    const incomingMessages = body?.messages;
+
+    if (!Array.isArray(incomingMessages) || incomingMessages.length === 0) {
+      return jsonResponse({ error: "Messages are required" }, 400);
+    }
+
+    // Convert the loose client payload into the exact message format the AI SDK expects.
+    const transformedMessages = normalizeMessages(incomingMessages);
+
+    if (transformedMessages.length === 0) {
+      return jsonResponse(
+        { error: "Messages must contain non-empty content" },
+        400,
+      );
+    }
+
+    const openrouter = createOpenRouter({
+      apiKey: openRouterApiKey,
+    });
+
+    // streamText returns an AI SDK stream response that can be forwarded to the client.
+    // This is what gives you token-by-token streaming instead of waiting for a full response.
+    const result = streamText({
+      model: openrouter("nvidia/nemotron-3-super-120b-a12b:free"),
+      messages: transformedMessages,
+      experimental_transform: smoothStream({
+        delayInMs: 10,
+        chunking: "word",
+      }),
+    });
+
+    const streamResponse = result.toUIMessageStreamResponse();
+
+    // Rebuild headers so the streaming response still includes CORS metadata.
+    // Without this, the browser could block the streamed response even though the server succeeded.
+    const headers = new Headers(streamResponse.headers);
+    
+    Object.entries(corsHeaders).forEach(([key, value]) => {
+      headers.set(key, value);
+    });
+
+    return new Response(streamResponse.body, {
+      status: streamResponse.status,
+      statusText: streamResponse.statusText,
+      headers,
+    });
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Internal Server Error";
+    return jsonResponse({ error: message }, 500);
+  }
+});

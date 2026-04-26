@@ -3,6 +3,11 @@ import {
   validateFileExtension,
   validateFileSize,
 } from "./file-utils.ts";
+import type {
+  ParseFileArgs,
+  UploadFilesWithProgressArgs,
+  UploadedFileData,
+} from "@studybot/types";
 
 // Map file extensions to the dedicated Supabase edge function that parses them.
 const extensionToParserFunction: Record<string, string> = {
@@ -29,13 +34,7 @@ const getParserFunctionByFileName = (fileName: string) => {
 };
 
 // Send a file to the matching edge function and return the parsed response.
-const parseFile = async ({
-  file,
-  invokeEdgeFunction,
-}: {
-  file: File;
-  invokeEdgeFunction: Function;
-}) => {
+const parseFile = async ({ file, invokeEdgeFunction }: ParseFileArgs) => {
   if (!file || !(file instanceof File)) {
     throw new Error("File is required");
   }
@@ -79,7 +78,7 @@ const parseFile = async ({
 };
 
 // Convert the upload response into the app-level attached file shape.
-const mapUploadedFile = (file: File, data: any) => {
+const mapUploadedFile = (file: File, data: UploadedFileData) => {
   return {
     name: file.name,
     type: file.type,
@@ -94,17 +93,7 @@ const uploadFilesWithProgress = ({
   files,
   uploadDocument,
   onOverallProgress,
-}: {
-  files: File[];
-  uploadDocument: (
-    file: File,
-    onProgress?: (percent: number) => void,
-  ) => Promise<any>;
-  onOverallProgress?: (
-    percent: number,
-    fileProgress: Record<string, number>,
-  ) => void;
-}) => {
+}: UploadFilesWithProgressArgs) => {
   if (!Array.isArray(files)) {
     throw new Error("files must be an array");
   }

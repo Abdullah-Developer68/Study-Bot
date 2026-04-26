@@ -1,12 +1,12 @@
 "use client";
-import React from "react";
-import useChatContext from "@/hooks/chat/useChatContext";
+import useChatContext from "@/hooks/chat/useChatContext.js";
+import type { CodeRendererProps } from "@studybot/types";
 import { Bot, Loader2, User, FileText } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
-import WelcomeScreen from "./WelcomeScreen";
+import WelcomeScreen from "./WelcomeScreen.tsx";
 
 const ChatBox = () => {
   const { messages, status } = useChatContext();
@@ -63,7 +63,7 @@ const ChatBox = () => {
   // Show welcome screen when no messages
   if (messages.length === 0 && !isLoading) {
     return (
-      <div className="flex flex-col p-4 gap-4 w-[90%] overflow-auto max-h-[80%] h-full mt-16">
+      <div className="flex flex-col p-4 gap-4 w-[90%] overflow-auto max-h-[80%] h-full mt-16 pb-44 scroll-pb-44">
         <WelcomeScreen />
       </div>
     );
@@ -71,7 +71,7 @@ const ChatBox = () => {
 
   return (
     <>
-      <div className="flex flex-col p-4 gap-4 w-[90%] overflow-auto max-h-[80%] h-full mt-16">
+      <div className="flex flex-col p-4 gap-4 w-[90%] overflow-auto max-h-[80%] h-full mt-16 pb-44 scroll-pb-44">
         {messages.map((message, index) => {
           const content = getMessageContent(message);
 
@@ -98,21 +98,21 @@ const ChatBox = () => {
                       rehypePlugins={[rehypeHighlight]}
                       components={{
                         // `node` is an object representing a markdown element in the parsed tree.
-                        pre: ({ node, ...props }) => (
+                        pre: ({ node: _node, ...props }) => (
                           <div className="overflow-auto my-2 rounded-lg bg-zinc-900 p-4">
                             <pre {...props} />
                           </div>
                         ),
-                        code: ({ node, inline, ...props }) =>
-                          inline ? (
-                            <code
-                              className="bg-blue-800 rounded px-1 py-0.5"
-                              {...props}
-                            />
-                          ) : (
-                            <code {...props} />
-                          ),
-                        p: ({ node, ...props }) => (
+                        code: ({
+                          node: _node,
+                          ...props
+                        }: CodeRendererProps) => (
+                          <code
+                            className="bg-blue-800 rounded px-1 py-0.5"
+                            {...props}
+                          />
+                        ),
+                        p: ({ node: _node, ...props }) => (
                           <p className="mb-2 last:mb-0" {...props} />
                         ),
                       }}
@@ -144,39 +144,39 @@ const ChatBox = () => {
                       rehypePlugins={[rehypeHighlight]}
                       components={{
                         // In here we are saying if you encounter these tags then apply the following styles to them
-                        pre: ({ node, ...props }) => (
+                        pre: ({ node: _node, ...props }) => (
                           <div className="overflow-auto my-2 rounded-lg bg-zinc-900 p-4">
                             <pre {...props} />
                           </div>
                         ),
-                        code: ({ node, inline, ...props }) =>
-                          inline ? (
-                            <code
-                              className="bg-zinc-700 rounded px-1 py-0.5"
-                              {...props}
-                            />
-                          ) : (
-                            <code {...props} />
-                          ),
-                        p: ({ node, ...props }) => (
+                        code: ({
+                          node: _node,
+                          ...props
+                        }: CodeRendererProps) => (
+                          <code
+                            className="bg-zinc-700 rounded px-1 py-0.5"
+                            {...props}
+                          />
+                        ),
+                        p: ({ node: _node, ...props }) => (
                           <p className="mb-2 last:mb-0" {...props} />
                         ),
-                        ul: ({ node, ...props }) => (
+                        ul: ({ node: _node, ...props }) => (
                           <ul
                             className="list-disc list-inside mb-2"
                             {...props}
                           />
                         ),
-                        ol: ({ node, ...props }) => (
+                        ol: ({ node: _node, ...props }) => (
                           <ol
                             className="list-decimal list-inside mb-2"
                             {...props}
                           />
                         ),
-                        li: ({ node, ...props }) => (
+                        li: ({ node: _node, ...props }) => (
                           <li className="mb-1" {...props} />
                         ),
-                        a: ({ node, ...props }) => (
+                        a: ({ node: _node, ...props }) => (
                           <a
                             className="text-blue-400 hover:text-blue-300 underline"
                             target="_blank"
@@ -184,13 +184,13 @@ const ChatBox = () => {
                             {...props}
                           />
                         ),
-                        blockquote: ({ node, ...props }) => (
+                        blockquote: ({ node: _node, ...props }) => (
                           <blockquote
                             className="border-l-4 border-gray-500 pl-4 italic my-2"
                             {...props}
                           />
                         ),
-                        table: ({ node, ...props }) => (
+                        table: ({ node: _node, ...props }) => (
                           <div className="overflow-auto my-2">
                             <table
                               className="min-w-full border-collapse border border-gray-600"
@@ -198,13 +198,13 @@ const ChatBox = () => {
                             />
                           </div>
                         ),
-                        th: ({ node, ...props }) => (
+                        th: ({ node: _node, ...props }) => (
                           <th
                             className="border border-gray-600 px-3 py-2 bg-gray-700"
                             {...props}
                           />
                         ),
-                        td: ({ node, ...props }) => (
+                        td: ({ node: _node, ...props }) => (
                           <td
                             className="border border-gray-600 px-3 py-2"
                             {...props}

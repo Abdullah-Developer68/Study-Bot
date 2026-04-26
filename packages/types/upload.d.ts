@@ -1,3 +1,4 @@
+// Final parsed document data returned by an upload parser.
 export interface UploadResponse {
   success: boolean;
   fileName: string;
@@ -9,6 +10,7 @@ export interface UploadResponse {
   message: string;
 }
 
+// File info stored in chat state after upload parsing.
 export interface AttachedFile {
   name: string;
   type: string;
@@ -16,11 +18,60 @@ export interface AttachedFile {
   extractedText: string;
   wasTruncated: boolean;
 }
+
+// Result from validating a file before upload.
 export interface FileValidationResult {
   valid: boolean;
   error: string | null;
 }
 
+// Tracks progress for each file during a batch upload.
 export type UploadProgressMap = Record<string, number>;
 
+// Callback for a single file's upload progress.
 export type UploadProgressCallback = (progress: number) => void;
+
+// Standard response shape from a parser edge function.
+export interface EdgeFunctionResponse {
+  data?: {
+    extractedText?: string;
+    wasTruncated?: boolean;
+  };
+  error?: {
+    message?: string;
+  } | null;
+}
+
+// Transport-agnostic edge function invoker.
+export type InvokeEdgeFunction = (
+  functionName: string,
+  options: { body: FormData },
+) => Promise<EdgeFunctionResponse>;
+
+// Input for parsing a single file.
+export interface ParseFileArgs {
+  file: File;
+  invokeEdgeFunction: InvokeEdgeFunction;
+}
+
+// Small subset of data we keep from a parser response.
+export interface UploadedFileData {
+  extractedText?: string;
+  wasTruncated?: boolean;
+}
+
+// Upload function expected by the batch helper.
+export type UploadDocumentFn = (
+  file: File,
+  onProgress?: (percent: number) => void,
+) => Promise<UploadResponse>;
+
+// Inputs for the batch upload helper.
+export interface UploadFilesWithProgressArgs {
+  files: File[];
+  uploadDocument: UploadDocumentFn;
+  onOverallProgress?: (
+    percent: number,
+    fileProgress: Record<string, number>,
+  ) => void;
+}
