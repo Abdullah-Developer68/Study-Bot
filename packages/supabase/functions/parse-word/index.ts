@@ -1,3 +1,5 @@
+/// <reference path="../deno-globals.d.ts" />
+
 import * as mammoth from "mammoth";
 import { Buffer } from "node:buffer";
 import {
@@ -7,6 +9,7 @@ import {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };

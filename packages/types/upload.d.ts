@@ -60,10 +60,16 @@ export interface UploadedFileData {
   wasTruncated?: boolean;
 }
 
+// Optional auth info for calling Supabase edge functions.
+export interface SupabaseFunctionAuthOptions {
+  accessToken?: string;
+}
+
 // Upload function expected by the batch helper.
 export type UploadDocumentFn = (
   file: File,
   onProgress?: (percent: number) => void,
+  options?: SupabaseFunctionAuthOptions,
 ) => Promise<UploadResponse>;
 
 // Inputs for the batch upload helper.

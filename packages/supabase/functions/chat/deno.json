@@ -1,7 +1,8 @@
 {
   "nodeModulesDir": "auto",
   "compilerOptions": {
-    "lib": ["deno.window"]
+    "lib": ["deno.window"],
+    "types": ["https://deno.land/std@0.224.0/types.d.ts"]
   },
   "imports": {
     "ai": "npm:ai@6.0.3",

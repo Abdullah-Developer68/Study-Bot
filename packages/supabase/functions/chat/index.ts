@@ -1,3 +1,6 @@
+/// <reference path="../deno-globals.d.ts" />
+
+
 import { streamText, smoothStream } from "ai";
 import type { ModelMessage } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
@@ -85,7 +88,7 @@ const normalizeMessages = (messages: IncomingMessage[]): ModelMessage[] => {
   return normalized;
 };
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   // Preflight requests must return immediately for browser clients.
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -145,7 +148,7 @@ Deno.serve(async (req) => {
     // Rebuild headers so the streaming response still includes CORS metadata.
     // Without this, the browser could block the streamed response even though the server succeeded.
     const headers = new Headers(streamResponse.headers);
-    
+
     Object.entries(corsHeaders).forEach(([key, value]) => {
       headers.set(key, value);
     });

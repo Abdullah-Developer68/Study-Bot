@@ -1,3 +1,5 @@
+/// <reference path="../deno-globals.d.ts" />
+
 import * as XLSX from "xlsx";
 import {
   getExtension,
@@ -6,13 +8,14 @@ import {
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
 
 const SUPPORTED_EXTENSIONS = ["xls", "xlsx"];
 
-Deno.serve(async (req) => {
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }

@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "description": "Shared api client utilities for StudyBot apps",
   "type": "module",
-  "main": "./axios-api-client.ts",
+  "main": "./api.client.ts",
   "exports": {
-    ".": "./axios-api-client.ts",
-    "./axios": "./axios-api-client.ts"
+    ".": "./api.client.ts",
+    "./axios": "./api.client.ts"
   },
   "files": [
-    "./axios-api-client.ts"
+    "./api.client.ts"
   ],
   "dependencies": {
     "@studybot/types": "*",

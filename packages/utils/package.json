@@ -8,12 +8,14 @@
     "mammoth": "^1.11.0",
     "officeparser": "^6.0.4",
     "unpdf": "^1.4.0",
+    "axios": "^1.13.2",
     "@studybot/types": "*"
   },
   "exports": {
     "./global": "./global/index.ts",
     "./global/upload.utils": "./global/upload.utils.ts",
     "./client": "./utils.client.js",
+    "./client/api.client.utils": "./client/api.client.utils.ts",
     "./server": "./utils.server.js",
     "./global/file-utils": "./global/file-utils.ts",
     "./server/document-parser": "./server/document-parser.js"

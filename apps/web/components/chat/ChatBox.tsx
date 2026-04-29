@@ -6,7 +6,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
-import WelcomeScreen from "./WelcomeScreen.tsx";
+import WelcomeScreen from "./WelcomeScreen";
 
 const ChatBox = () => {
   const { messages, status } = useChatContext();

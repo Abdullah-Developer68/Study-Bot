@@ -15,7 +15,8 @@ import {
   BadgeQuestionMark,
   WalletCards,
 } from "lucide-react";
-import useChatContext from "@/hooks/chat/useChatContext.js";
+import useChatContext from "@/hooks/chat/useChatContext";
+import { createClient } from "@/utils/supabase/client";
 import { uploadDocument } from "@studybot/api-client";
 
 // Import validators directly from file-utils to avoid barrel export ambiguity.
@@ -30,17 +31,18 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu.jsx";
+} from "@/components/ui/dropdown-menu";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupText,
   InputGroupTextarea,
-} from "@/components/ui/input-group.jsx";
-import { Separator } from "@/components/ui/separator.jsx";
+} from "@/components/ui/input-group";
+import { Separator } from "@/components/ui/separator";
 
 const SUPPORTED_FILE_TYPES = getSupportedExtensions();
+const supabaseClient = createClient();
 
 const Input = () => {
   // Context
@@ -83,10 +85,24 @@ const Input = () => {
     setUploadProgress(0);
 
     try {
+      const { data: sessionResult, error: sessionError } =
+        await supabaseClient.auth.getSession();
+
+      if (sessionError) {
+        throw new Error(sessionError.message);
+      }
+
+      const accessToken = sessionResult?.session?.access_token;
+
+      if (!accessToken) {
+        throw new Error("Please sign in again before uploading files.");
+      }
+
       // Upload all files in parallel
       const uploadedFiles = await uploadFilesWithProgress({
         files,
-        uploadDocument,
+        uploadDocument: (file, onProgress) =>
+          uploadDocument(file, onProgress, { accessToken }),
         onOverallProgress: (overallProgress: number) => {
           setUploadProgress(overallProgress);
         },
