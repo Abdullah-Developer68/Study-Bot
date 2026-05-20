@@ -1,17 +1,13 @@
-/**
- * Server-only document parsing utilities.
- *
- * Why this split is required:
- * - Next.js builds client bundles by following import/export graphs.
- * - If server parsing code is re-exported from a client-consumed barrel, browser builds
- *   may try to resolve Node-only dependencies (for example modules that require "fs").
- * - Keeping parser code in a dedicated server path prevents server-only dependencies
- *   from leaking into client component bundles.
- */
+// Server-only document parsing utilities.
+//
+// Why this split is required:
+// - Next.js builds client bundles by following import/export graphs.
+// - If server parsing code is re-exported from a client-consumed barrel, browser builds
+//   may try to resolve Node-only dependencies (for example modules that require "fs").
+// - Keeping parser code in a dedicated server path prevents server-only dependencies
+//   from leaking into client component bundles.
 
-/**
- * Extract text from PDF file using unpdf (server-side compatible). This is used in the upload route.
- */
+// Extract text from PDF file using unpdf (server-side compatible). This is used in the upload route.
 const parsePDF = async (buffer) => {
   try {
     const { extractText } = await import("unpdf");
