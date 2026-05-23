@@ -2,14 +2,23 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import { PanelLeftIcon, Plus } from "lucide-react";
+import {
+  PanelLeftIcon,
+  Plus,
+  MessageSquare,
+  PencilLine,
+  FileChartPie,
+  Settings2,
+} from "lucide-react";
 
-
+import Image from "next/image";
 import { useIsMobile } from "@/hooks/use-mobile";
+import useAuth from "@/hooks/auth/useAuth";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { assets } from "@studybot/assets/asset";
 import {
   Sheet,
   SheetContent,
@@ -234,39 +243,110 @@ function Sidebar({
 function SidebarTrigger({ className, onClick, ...props }) {
   const { toggleSidebar, open, isMobile, openMobile } = useSidebar();
   const sidebarOpen = isMobile ? openMobile : open;
+  const { user } = useAuth();
+
+  if (sidebarOpen) {
+    return null;
+  }
+
+  const quickActions = [
+    { key: "chat", label: "Chat", icon: MessageSquare },
+    { key: "editor", label: "Editor", icon: PencilLine },
+    { key: "templates", label: "Templates", icon: FileChartPie },
+  ];
+
+  const avatarSrc =
+    user?.user_metadata?.avatar_url ||
+    user?.user_metadata?.picture ||
+    user?.user_metadata?.image ||
+    assets.chillGuy;
 
   return (
     <div
       className={cn(
-        "fixed top-3 left-5 z-999 h-fit rounded-md p-2 pointer-events-auto",
-        sidebarOpen ? "bg-transparent" : "bg-gray-600",
+        "fixed inset-y-0 left-0 z-999 flex w-14 flex-col border-r border-white/10 bg-zinc-950/95 px-2 py-3 pointer-events-auto",
+        className,
       )}
     >
-      <Button
-      data-sidebar="trigger"
-      data-slot="sidebar-trigger"
-      variant="ghost"
-      size="icon"
-      className={cn("size-7", className)}
-      onClick={(event) => {
-        onClick?.(event);
-        toggleSidebar();
-      }}
-      {...props}
-    >
-      <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
-      </Button>
-      {!sidebarOpen && (
+      <div className="flex flex-col items-center gap-2">
+        <Button
+          data-sidebar="trigger"
+          data-slot="sidebar-trigger"
+          variant="ghost"
+          size="icon"
+          className="size-7 shrink-0 rounded-xl"
+          onClick={(event) => {
+            onClick?.(event);
+            toggleSidebar();
+          }}
+          {...props}
+        >
+          <PanelLeftIcon />
+          <span className="sr-only">Toggle Sidebar</span>
+        </Button>
+
         <Button
           variant="ghost"
           size="icon"
-          className="size-7"
+          className="size-7 shrink-0 rounded-xl"
           aria-label="New chat"
         >
-          <Plus className="size-4" />
+          <Plus className="size-3.5" />
         </Button>
-      )}
+
+        <div className="mt-2 flex flex-col items-center gap-1 rounded-2xl bg-zinc-900/90 p-1 ring-1 ring-white/10 shadow-lg overflow-hidden">
+          {quickActions.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <Tooltip key={item.key}>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={item.label}
+                    title={item.label}
+                    className="relative z-10 flex h-8 w-8 items-center justify-center rounded-lg ring-1 transition-colors bg-transparent text-white/70 ring-transparent hover:bg-white/5 hover:text-white"
+                  >
+                    <Icon className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" sideOffset={8}>{item.label}</TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-auto flex flex-col items-center gap-2 pb-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label="Settings"
+              title="Settings"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-white/70 ring-1 ring-transparent transition-colors hover:bg-white/5 hover:text-white"
+            >
+              <Settings2 className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right">Settings</TooltipContent>
+        </Tooltip>
+
+        <button
+          type="button"
+          aria-label="Profile"
+          title="Profile"
+          className="h-8 w-8 overflow-hidden rounded-full ring-1 ring-white/10 transition-transform hover:scale-[1.02]"
+        >
+          <Image
+            src={avatarSrc}
+            alt="Profile"
+            width={32}
+            height={32}
+            className="h-full w-full object-cover"
+          />
+        </button>
+      </div>
     </div>
   );
 }

@@ -20,7 +20,7 @@ const ProtectedRoute = ({
         currentPath !== "/"
           ? `${redirectTo}?redirectTo=${currentPath}`
           : redirectTo;
-      router.push(redirectUrl);
+      router.replace(redirectUrl);
     }
   }, [loading, isAuthenticated, router, redirectTo]);
 
