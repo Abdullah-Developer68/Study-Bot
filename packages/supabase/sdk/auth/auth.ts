@@ -8,7 +8,11 @@ type OAuthProvider = Parameters<
   SupabaseClient["auth"]["signInWithOAuth"]
 >[0]["provider"];
 
-// Ensures a valid Supabase client with auth capabilities is provided.
+// asserts tells TS that this function verifies the value at runtime. if it does not throw,
+// the value is safe to use as SupabaseClient. if assert is not used we will get a compile time error
+// as TS will think supabaseClient can be null or undefined, but using assert tells TS to assume
+// that after the function returns successfully that check has passed. if function throws error then
+// the supabase client is not valid or not provided.
 function ensureClient(
   supabaseClient: SupabaseClient | null | undefined,
 ): asserts supabaseClient is SupabaseClient {
