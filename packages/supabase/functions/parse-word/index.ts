@@ -1,5 +1,3 @@
-/// <reference path="../deno-globals.d.ts" />
-
 import * as mammoth from "mammoth";
 import { Buffer } from "node:buffer";
 import {

@@ -1,5 +1,3 @@
-/// <reference path="../deno-globals.d.ts" />
-
 import { extractText } from "unpdf";
 import {
   getExtension,

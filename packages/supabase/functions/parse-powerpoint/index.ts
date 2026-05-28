@@ -1,5 +1,3 @@
-/// <reference path="../deno-globals.d.ts" />
-
 import { parseOffice } from "officeparser";
 import { Buffer } from "node:buffer";
 import {

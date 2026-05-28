@@ -1,4 +1,3 @@
-/// <reference path="../deno-globals.d.ts" />
 import type { ModelMessage } from "ai";
 import type { IncomingMessage } from "@/types/chat.types.ts";
 import { streamText, smoothStream } from "ai";

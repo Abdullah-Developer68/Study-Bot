@@ -1,5 +1,3 @@
-/// <reference path="../deno-globals.d.ts" />
-
 import * as XLSX from "xlsx";
 import {
   getExtension,

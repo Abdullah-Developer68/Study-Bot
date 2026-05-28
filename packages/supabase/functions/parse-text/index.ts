@@ -1,5 +1,3 @@
-/// <reference path="../deno-globals.d.ts" />
-
 import {
   getExtension,
   validateFileSize,
