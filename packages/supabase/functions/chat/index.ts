@@ -1,5 +1,5 @@
 import type { ModelMessage } from "ai";
-import type { IncomingMessage } from "@/types/chat.function.types.ts";
+import type { IncomingMessage, IncomingMessageRole } from "@/types/chat.function.types.ts";
 import { streamText, smoothStream } from "ai";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
@@ -27,12 +27,11 @@ const supportedModels = new Set([
   DEFAULT_MODEL,
 ]);
 
-// AI SDK model messages only support a limited set of roles here.
-// This guard lets TypeScript narrow a generic string role into a valid AI SDK role.
+// used for debugging. Accepts any value, but returns true only if it is valid
 const isSupportedRole = (
-  role: IncomingMessage["role"],
-): role is "user" | "assistant" | "system" => {
-  return role === "user" || role === "assistant" || role === "system";
+  role: unknown,
+): role is IncomingMessageRole => {
+  return role === "user" || role === "assistant" || role === "system" || role === "tool";
 };
 
 // Small helper for consistent JSON error responses.
@@ -51,8 +50,7 @@ const extractAssistantTextFromParts = (
   parts: IncomingMessage["parts"],
 ): string => {
   if (!Array.isArray(parts)) return "";
-  // Assistant messages can arrive as structured parts instead of a single string.
-  // We only keep text parts here and ignore any non-text content.
+ // convert parts(individual strings) into 1 string
   return parts
     .filter((part) => part?.type === "text")
     .map((part) => part?.text ?? "")
@@ -60,8 +58,6 @@ const extractAssistantTextFromParts = (
 };
 
 // Normalize user/assistant messages into the strict AI SDK ModelMessage format.
-// This step protects the AI call from unsupported roles and empty messages,
-// which can happen because the chat client sends the full conversation state.
 const normalizeMessages = (messages: IncomingMessage[]): ModelMessage[] => {
   const normalized: ModelMessage[] = [];
 
