@@ -141,9 +141,9 @@ const DEFAULT_TEMPLATES: Array<{
 ];
 
 function ensureClient(
-  supabaseClient: SupabaseClient | null | undefined,
-): asserts supabaseClient is SupabaseClient {
-  if (!supabaseClient?.from) {
+  supabase: SupabaseClient | null | undefined,
+): asserts supabase is SupabaseClient {
+  if (!supabase?.from) {
     throw new Error("Supabase client is required");
   }
 }
@@ -183,9 +183,7 @@ const normalizeTemplateContent = (content: unknown): TemplateContent => {
   return content as TemplateContent;
 };
 
-const isSeedMarkerRow = (
-  row: TemplateSummaryRow | null | undefined,
-): boolean =>
+const isSeedMarkerRow = (row: TemplateSummaryRow | null | undefined): boolean =>
   row?.name === DEFAULT_TEMPLATE_SEED_NAME &&
   row?.category === DEFAULT_TEMPLATE_SEED_CATEGORY;
 
@@ -230,17 +228,17 @@ const buildDefaultTemplateRows = (
 };
 
 const ensureDefaultTemplates = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   profileId: string | null | undefined,
 ): Promise<SeedResult> => {
   try {
-    ensureClient(supabaseClient);
+    ensureClient(supabase);
 
     if (!profileId) {
       return { seeded: false, error: "Profile ID is required" };
     }
 
-    const { data: existingRows, error: fetchError } = await supabaseClient
+    const { data: existingRows, error: fetchError } = await supabase
       .from("templates")
       .select("template_id, name, category")
       .eq("profile_id", profileId);
@@ -264,15 +262,18 @@ const ensureDefaultTemplates = async (
 
     const templateRows = buildDefaultTemplateRows(profileId, existingNames);
 
-    const payload: Array<TemplateInsertRow | TemplateInsertRow & {
-      profile_id: string;
-      name: string;
-      description: string;
-      category: string;
-      tags: string[];
-      content: TemplateContent;
-      is_public: boolean;
-    }> = [
+    const payload: Array<
+      | TemplateInsertRow
+      | (TemplateInsertRow & {
+          profile_id: string;
+          name: string;
+          description: string;
+          category: string;
+          tags: string[];
+          content: TemplateContent;
+          is_public: boolean;
+        })
+    > = [
       ...templateRows,
       {
         profile_id: profileId,
@@ -288,7 +289,7 @@ const ensureDefaultTemplates = async (
       },
     ];
 
-    const { error: insertError } = await supabaseClient
+    const { error: insertError } = await supabase
       .from("templates")
       .insert(payload);
 
@@ -306,17 +307,17 @@ const ensureDefaultTemplates = async (
 };
 
 const listTemplates = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   profileId: string | null | undefined,
 ): Promise<TemplatesResult> => {
   try {
-    ensureClient(supabaseClient);
+    ensureClient(supabase);
 
     if (!profileId) {
       return { templates: null, error: "Profile ID is required" };
     }
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from("templates")
       .select("*")
       .eq("profile_id", profileId)
@@ -342,17 +343,17 @@ const listTemplates = async (
 };
 
 const getTemplateById = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   templateId: string | null | undefined,
 ): Promise<TemplateResult> => {
   try {
-    ensureClient(supabaseClient);
+    ensureClient(supabase);
 
     if (!templateId) {
       return { template: null, error: "Template ID is required" };
     }
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from("templates")
       .select("*")
       .eq("template_id", templateId)
@@ -375,11 +376,11 @@ const getTemplateById = async (
 };
 
 const createTemplate = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   input: TemplateInput = {},
 ): Promise<TemplateResult> => {
   try {
-    ensureClient(supabaseClient);
+    ensureClient(supabase);
 
     const {
       profileId,
@@ -418,7 +419,7 @@ const createTemplate = async (
       is_public: false,
     };
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from("templates")
       .insert(payload)
       .select("*")
@@ -441,12 +442,12 @@ const createTemplate = async (
 };
 
 const updateTemplate = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   templateId: string | null | undefined,
   input: TemplateUpdateInput = {},
 ): Promise<TemplateResult> => {
   try {
-    ensureClient(supabaseClient);
+    ensureClient(supabase);
 
     if (!templateId) {
       return { template: null, error: "Template ID is required" };
@@ -491,7 +492,7 @@ const updateTemplate = async (
 
     patch.is_public = false;
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from("templates")
       .update(patch)
       .eq("template_id", templateId)
@@ -515,17 +516,17 @@ const updateTemplate = async (
 };
 
 const deleteTemplate = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   templateId: string | null | undefined,
 ): Promise<{ error: string | null }> => {
   try {
-    ensureClient(supabaseClient);
+    ensureClient(supabase);
 
     if (!templateId) {
       return { error: "Template ID is required" };
     }
 
-    const { error } = await supabaseClient
+    const { error } = await supabase
       .from("templates")
       .delete()
       .eq("template_id", templateId);
@@ -551,4 +552,4 @@ export {
   deleteTemplate,
   normalizeTemplateContent,
 };
-export {}
+export {};

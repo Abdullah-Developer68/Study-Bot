@@ -1,26 +1,31 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { OwnedImageParams, SignedImageOptions, UploadImageOptions, UploadOptions } from "../types/storage.sdk.types";
+import type {
+  OwnedImageParams,
+  SignedImageOptions,
+  UploadImageOptions,
+  UploadOptions,
+} from "../types/storage.sdk.types";
 
 // Validates that a usable Supabase client with storage access is provided.
 function ensureClient(
-  supabaseClient: SupabaseClient | null | undefined,
-): asserts supabaseClient is SupabaseClient {
-  if (!supabaseClient?.storage) {
+  supabase: SupabaseClient | null | undefined,
+): asserts supabase is SupabaseClient {
+  if (!supabase?.storage) {
     throw new Error("Supabase client is required");
   }
 }
 
 // Uploads a generic file to a specified bucket/path with optional content type and upsert.
 const uploadFile = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   path: string,
   file: BodyInit,
   options: UploadOptions = {},
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
-  const { data, error } = await supabaseClient.storage
+  const { data, error } = await supabase.storage
     .from(bucket)
     .upload(path, file, {
       contentType: options.contentType,
@@ -36,13 +41,13 @@ const uploadFile = async (
 
 // Uploads an image to the images bucket, generates a public URL, and returns upload metadata.
 const uploadImage = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   file: File | null | undefined,
   userId: string | null | undefined,
   templateId: string | null = null,
   onProgress: UploadImageOptions["onProgress"] = null,
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
   if (!file) {
     return { url: null, path: null, error: "No file provided" };
@@ -60,7 +65,7 @@ const uploadImage = async (
 
   const arrayBuffer = await file.arrayBuffer();
 
-  const { error } = await supabaseClient.storage
+  const { error } = await supabase.storage
     .from("images")
     .upload(filePath, arrayBuffer, {
       contentType: file.type,
@@ -71,7 +76,7 @@ const uploadImage = async (
     return { url: null, path: null, error: error.message };
   }
 
-  const { data: urlData } = supabaseClient.storage
+  const { data: urlData } = supabase.storage
     .from("images")
     .getPublicUrl(filePath);
 
@@ -89,26 +94,26 @@ const uploadImage = async (
 
 // Returns a public URL for a file stored in a given bucket/path.
 const getPublicUrl = (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   path: string,
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
-  const { data } = supabaseClient.storage.from(bucket).getPublicUrl(path);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return { url: data.publicUrl };
 };
 
 // Creates a time-limited signed URL for secure file access.
 const getSignedUrl = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   path: string,
   expiresIn = 3600,
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
-  const { data, error } = await supabaseClient.storage
+  const { data, error } = await supabase.storage
     .from(bucket)
     .createSignedUrl(path, expiresIn);
 
@@ -121,11 +126,11 @@ const getSignedUrl = async (
 
 // Resolves an uploaded image value into a usable URL (passthrough for absolute URLs, signed URL for storage paths).
 const resolveImageUrl = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   pathOrUrl: string | null | undefined,
   options: SignedImageOptions = {},
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
   if (typeof pathOrUrl !== "string" || pathOrUrl.length === 0) {
     return { url: null, error: "Invalid image path/url" };
@@ -138,25 +143,20 @@ const resolveImageUrl = async (
   const bucket = options.bucket ?? "images";
   const expiresIn = options.expiresIn ?? 3600;
 
-  const result = await getSignedUrl(
-    supabaseClient,
-    bucket,
-    pathOrUrl,
-    expiresIn,
-  );
+  const result = await getSignedUrl(supabase, bucket, pathOrUrl, expiresIn);
   return result;
 };
 
 // Deletes one or multiple files from a storage bucket.
 const deleteFile = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   paths: string | string[],
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
   const pathsArray = Array.isArray(paths) ? paths : [paths];
-  const { data, error } = await supabaseClient.storage
+  const { data, error } = await supabase.storage
     .from(bucket)
     .remove(pathsArray);
 
@@ -169,20 +169,22 @@ const deleteFile = async (
 
 // Lists files in a bucket folder with pagination and sorting options.
 const listFiles = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   folder: string = "",
-  options: { limit?: number; offset?: number; sortBy?: { column: string; order: "asc" | "desc" } } = {},
+  options: {
+    limit?: number;
+    offset?: number;
+    sortBy?: { column: string; order: "asc" | "desc" };
+  } = {},
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
-  const { data, error } = await supabaseClient.storage
-    .from(bucket)
-    .list(folder, {
-      limit: options.limit ?? 100,
-      offset: options.offset ?? 0,
-      sortBy: options.sortBy ?? { column: "created_at", order: "desc" },
-    });
+  const { data, error } = await supabase.storage.from(bucket).list(folder, {
+    limit: options.limit ?? 100,
+    offset: options.offset ?? 0,
+    sortBy: options.sortBy ?? { column: "created_at", order: "desc" },
+  });
 
   if (error) {
     return { files: null, error: error.message };
@@ -193,14 +195,14 @@ const listFiles = async (
 
 // Moves a file within the same bucket from one path to another.
 const moveFile = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   fromPath: string,
   toPath: string,
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
-  const { data, error } = await supabaseClient.storage
+  const { data, error } = await supabase.storage
     .from(bucket)
     .move(fromPath, toPath);
 
@@ -213,14 +215,14 @@ const moveFile = async (
 
 // Copies a file within the same bucket from one path to another.
 const copyFile = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   fromPath: string,
   toPath: string,
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
-  const { data, error } = await supabaseClient.storage
+  const { data, error } = await supabase.storage
     .from(bucket)
     .copy(fromPath, toPath);
 
@@ -233,15 +235,13 @@ const copyFile = async (
 
 // Downloads a file from a bucket/path and returns the file payload.
 const downloadFile = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   bucket: string,
   path: string,
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
-  const { data, error } = await supabaseClient.storage
-    .from(bucket)
-    .download(path);
+  const { data, error } = await supabase.storage.from(bucket).download(path);
 
   if (error) {
     return { data: null, error: error.message };
@@ -252,10 +252,10 @@ const downloadFile = async (
 
 // Creates a signed image URL only if the requested path belongs to the requester
 const signOwnedImagePath = async (
-  supabaseClient: SupabaseClient | null | undefined,
+  supabase: SupabaseClient | null | undefined,
   params: OwnedImageParams = {},
 ) => {
-  ensureClient(supabaseClient);
+  ensureClient(supabase);
 
   const {
     requesterId,
@@ -288,7 +288,7 @@ const signOwnedImagePath = async (
   }
 
   const signed = await getSignedUrl(
-    supabaseClient,
+    supabase,
     bucket,
     normalizedPath,
     expiresIn,
