@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    '@supabase/supabase-js':
+      specifier: ^2.97.0
+      version: 2.108.2
+
 overrides:
   axios: 1.16.1
   follow-redirects: 1.16.0
@@ -87,7 +93,7 @@ importers:
         specifier: ^0.8.0
         version: 0.8.0(@supabase/supabase-js@2.108.2)
       '@supabase/supabase-js':
-        specifier: ^2.97.0
+        specifier: 'catalog:'
         version: 2.108.2
       '@tabler/icons-react':
         specifier: ^3.35.0

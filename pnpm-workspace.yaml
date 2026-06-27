@@ -2,6 +2,13 @@ packages:
   - "apps/*"
   - "packages/*"
 
+# Centralized dependency versions shared across workspace packages.
+# Consumers reference these with the "catalog:" protocol in their package.json,
+# so a shared dependency only needs to be bumped in one place.
+catalog:
+  axios: "^1.16.1"
+  "@supabase/supabase-js": "^2.97.0"
+
 allowBuilds:
   '@parcel/watcher': true
   es5-ext: true
