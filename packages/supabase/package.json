@@ -25,5 +25,8 @@
   },
   "dependencies": {
     "supabase": "^2.84.4"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "*"
   }
 }

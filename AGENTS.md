@@ -44,14 +44,14 @@ This repository is a Turborepo monorepo for StudyBot, an AI-assisted academic pr
 
 ## Useful Root Commands
 
-- `npm install`
-- `npm run dev:web`
-- `npm run build`
-- `npm run typecheck`
+- `pnpm install`
+- `pnpm run dev:web`
+- `pnpm run build`
+- `pnpm run typecheck`
 
 ## Supabase Edge Functions Pattern
 
-- All Edge Functions are located in `supabase/functions/`.
+- All Edge Functions are located in `packages/supabase/functions/`.
 - The `_shared/` folder (prefixed with underscore) contains reusable helpers that get bundled into each function but are not deployed as standalone functions.
 - Use `getSupabaseClient(req)` for user-authenticated operations (respects RLS).
 - Use `getAdminClient()` only for admin tasks that bypass RLS.

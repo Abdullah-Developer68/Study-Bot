@@ -87,7 +87,7 @@ StudyBot/
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- pnpm or npm
 - Supabase account
 
 ### Installation
@@ -95,7 +95,7 @@ StudyBot/
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. Set up environment variables
@@ -106,7 +106,7 @@ StudyBot/
 **Web:**
 ```bash
 cd web
-npm run dev
+pnpm run dev
 ```
 
 **Mobile:**

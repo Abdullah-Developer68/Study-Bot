@@ -12,8 +12,8 @@
     "./api.client.ts"
   ],
   "dependencies": {
-    "@studybot/types": "*",
-    "@studybot/utils": "*",
+    "@studybot/types": "workspace:*",
+    "@studybot/utils": "workspace:*",
     "axios": "^1.16.1"
   }
 }

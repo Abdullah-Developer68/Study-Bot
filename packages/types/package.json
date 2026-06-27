@@ -9,6 +9,12 @@
       "types": "./index.types.ts"
     }
   },
+  "peerDependencies": {
+    "react": "*"
+  },
+  "devDependencies": {
+    "@types/react": "*"
+  },
   "files": [
     "index.types.ts",
     "upload.types.ts",
